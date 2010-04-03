@@ -12,19 +12,15 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
       if (is_array($vocabulary) && $vocabulary['#type'] == 'select') {
         $safe_terms = _taxonomy_tree_select_taxonomy_format_tree(taxonomy_get_tree($key), 0);
 
-        /**
-        * Prepare one vocabulary to be passed to javascript
-        */
+        // Prepare one vocabulary to be passed to javascript
         $treeded_vocabularies[$key] = array(
           'id' => $key,
           'terms' => $safe_terms,
           'multiple' => $vocabulary['#multiple']
         );
 
-        // Add an custom class if Garland is in use
-        if ($theme == 'garland') {
-          $treeded_vocabularies[$key]['classes'][] = 'taxonomy-tree-garland';
-        }
+        // Add an custom class based on theme in use
+        $treeded_vocabularies[$key]['classes'][] = 'taxonomy-tree-' . $theme;
       }
     }
 
