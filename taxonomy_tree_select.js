@@ -24,6 +24,7 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
         $select.hide();
         $wrapper.append(list);
         var $list = $("#" + listId);
+        var $items = $list.find("label");
         var $expansables = $list.find("li.expansable");
 
         $list
@@ -65,7 +66,30 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
             return false;
           });
 
+        $items
+          .bind("sync", function(e) {
+            var $label = $(this);
+            if (!$label.is("label")) {
+              return;
+            }
+            var labelFor = $label.attr("for");
+            var state = $select.find("option[value='" + labelFor + "']").attr("selected");
+
+            if (state) {
+              $label.addClass("active");
+            }
+            else {
+              $label.removeClass("active");
+            }
+          });
+
         $expansables
+          .bind("init", function(e) {
+            var $item = $(this);
+            if ($item.find(".active").length) {
+              $item.trigger("expand");
+            }
+          })
           .bind("collapse", function() {
             var $item = $(this);
             var $child = $item.children("ul");
@@ -83,6 +107,9 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
               .addClass("expanded");
           })
           .children("ul").hide();
+
+        $items.trigger("sync");
+        $expansables.trigger("init");
       });
     }
   }

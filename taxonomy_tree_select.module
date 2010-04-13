@@ -25,7 +25,14 @@ function taxonomy_tree_select_taxonomy($op, $type, $form_values) {
     switch ($op) {
       case 'insert':
       case 'update':
-        variable_set('vocabulary_' . $form_values['vid'] . '_tree_select', $form_values['taxonomy_tree_select']);
+        $key = 'vocabulary_' . $form_values['vid'] . '_tree_select';
+        $value = $form_values['taxonomy_tree_select'];
+        if ($value) {
+          variable_set($key, $value);
+        }
+        elseif (variable_get($key)) {
+          variable_del($key);
+        }
         break;
     }
   }
