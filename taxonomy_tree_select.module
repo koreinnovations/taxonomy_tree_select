@@ -102,9 +102,11 @@ function _taxonomy_tree_select_taxonomy_format_tree($terms = array(), $parent = 
     }
   }
 
-  foreach ($safe_terms as &$term) {
-    if (isset($tree_temp[$term['tid']])) {
-      $term['terms'] = _taxonomy_tree_select_taxonomy_format_tree($tree_temp[$term['tid']], $term['tid'], $tree_temp);
+  if (is_array($safe_terms)) {
+    foreach ($safe_terms as &$term) {
+      if (isset($tree_temp[$term['tid']])) {
+        $term['terms'] = _taxonomy_tree_select_taxonomy_format_tree($tree_temp[$term['tid']], $term['tid'], $tree_temp);
+      }
     }
   }
   return $safe_terms;
