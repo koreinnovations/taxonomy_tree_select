@@ -30,7 +30,7 @@ function taxonomy_tree_select_taxonomy($op, $type, $form_values) {
         if ($value) {
           variable_set($key, $value);
         }
-        elseif (variable_get($key)) {
+        elseif (variable_get($key, 0)) {
           variable_del($key);
         }
         break;
