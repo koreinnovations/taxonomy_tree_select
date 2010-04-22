@@ -7,9 +7,13 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
     var $form = $("#node-form", context),
     $wrapper;
 
-    if ($form.length) {
+    if (vocabularies && $form.length) {
       $.each(vocabularies, function(i) {
         var vocabulary = vocabularies[i];
+
+        if (!vocabulary.terms) {
+          return;
+        }
         
         var $wrapper = $("#edit-taxonomy-" + vocabulary.id + "-wrapper");
         var $select = $("#edit-taxonomy-" + vocabulary.id);
