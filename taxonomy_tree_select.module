@@ -34,7 +34,6 @@ function taxonomy_tree_select_taxonomy($op, $type, $form_values) {
           variable_del($key);
         }
         break;
-        kpr($form_values);
       case 'delete':
         variable_del($key);
         break;
