@@ -4,6 +4,7 @@ div.taxonomy-tree ul.menu {
   margin: 0;
 }
 div.taxonomy-tree ul.menu li {
+  cursor: pointer;
   margin: 2px 0;
   padding-bottom: 0;
   padding-right: 0;

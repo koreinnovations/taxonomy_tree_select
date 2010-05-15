@@ -33,41 +33,45 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
 
         $list
           .bind("click", function(e) {
-            var $label = $(e.target);
-            if (!$label.is("label")) {
-              return;
+            var $target = $(e.target);
+            var multiple = e.ctrlKey && vocabulary.multiple;
+
+            if ($target.is("li")) {
+              var target = "li";
+              var $item = $target;
             }
-            if (e.ctrlKey && vocabulary.multiple) {
-              var multiple = true;
+            else if ($target.is("label")) {
+              var target = "label";
+              var $item = $target.parent("li");
             }
 
-            var $item = $label.parent("li");
-            var $child = $label.siblings("ul");
+            switch (target) {
+              case "label":
+                var labelFor = $target.attr("for");
 
-            var labelFor = $label.attr("for");
+                if (!multiple) {
+                  $list.find(".active").removeClass("active");
+                  $select.find("option[selected]").removeAttr("selected");
+                }
 
-            if ($child.length && $child.is(":visible") && !multiple) {
-              $item.trigger("collapse");
-            }
-            else if ($child.length && !$child.is(":visible")) {
-              $item.trigger("expand");
-            }
+                if (multiple && $target.is(".active")) {
+                  $target.removeClass("active");
+                  $select.find("option[value='" + labelFor + "']").removeAttr("selected");
+                }
+                else {
+                  $target.addClass("active");
+                  $select.find("option[value='" + labelFor + "']").attr("selected", "selected");
+                }
+              case "li":
+                var $child = $item.children("ul");
 
-            if (!multiple) {
-              $list.find(".active").removeClass("active");
-              $select.find("option").removeAttr("selected");
+                if ($child.length && $child.is(":visible") && !multiple) {
+                  $item.trigger("collapse");
+                }
+                else if ($child.length && !$child.is(":visible")) {
+                  $item.trigger("expand");
+                }
             }
-
-            if (multiple && $label.is(".active")) {
-              $label.removeClass("active");
-              $select.find("option[value='" + labelFor + "']").removeAttr("selected");
-            }
-            else {
-              $label.addClass("active");
-              $select.find("option[value='" + labelFor + "']").attr("selected", "selected");
-            }
-
-            return false;
           });
 
         $items
