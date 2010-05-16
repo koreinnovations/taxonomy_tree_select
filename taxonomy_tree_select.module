@@ -21,11 +21,11 @@ function taxonomy_tree_select_form_taxonomy_form_vocabulary_alter(&$form, &$form
  * Implementation of hook_taxonomy().
  */
 function taxonomy_tree_select_taxonomy($op, $type, $form_values) {
-  if ($type = 'vocabulary') {
+  if ($form_values['form_id'] == 'taxonomy_form_vocabulary') {
+    $key = 'vocabulary_' . $form_values['vid'] . '_tree_select';
     switch ($op) {
       case 'insert':
       case 'update':
-        $key = 'vocabulary_' . $form_values['vid'] . '_tree_select';
         $value = $form_values['taxonomy_tree_select'];
         if ($value) {
           variable_set($key, $value);
