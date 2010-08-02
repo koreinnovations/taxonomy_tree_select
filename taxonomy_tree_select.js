@@ -34,7 +34,7 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
         $list
           .bind("click", function(e) {
             var $target = $(e.target);
-            var multiple = e.ctrlKey && vocabulary.multiple;
+            var multiple = (e.ctrlKey || e.metaKey) && vocabulary.multiple;
 
             if ($target.is("li")) {
               var target = "li";
