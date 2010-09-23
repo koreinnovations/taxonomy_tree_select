@@ -68,13 +68,27 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
 
     // If is there some vocabulary to be added into javascript setting
     if (count($treeded_vocabularies)) {
-      $javascript_settings['taxonomyTreeSelect'] = $treeded_vocabularies;
+      $form['taxonomy_tree_select']['treeded_vocabularies'] = array(
+        '#type' => 'value',
+        '#value' => $treeded_vocabularies
+      );
 
-      drupal_add_js($javascript_settings, 'setting');
-      drupal_add_js(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.js');
-      drupal_add_css(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.css');
+      $form['#after_build'][] = '_taxonomy_tree_select_add_external_files';
     }
   }
+}
+
+function _taxonomy_tree_select_add_external_files($form, $form_state) {
+  drupal_add_js(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.js');
+  drupal_add_css(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.css');
+
+  if ($form['taxonomy_tree_select']['treeded_vocabularies']['#value']) {
+    drupal_add_js(array(
+      'taxonomyTreeSelect' => $form['taxonomy_tree_select']['treeded_vocabularies']['#value']
+    ), 'setting');
+  }
+
+  return $form;
 }
 
 /**

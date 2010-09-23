@@ -1,11 +1,17 @@
 // $Id$
 
+Taxonomy Tree Select 6.x-1.0-dev
+----------------------
+- Fixed #908910 bug report by jessehs: JS/CSS files not loading after a validation error.
+
+
 Taxonomy Tree Select 6.x-1.0-alpha2
 ----------------------
 - Fixed a bug when your save an vocabulary definitions and see the message "Missing default arguments" to variable_get function.
 - Fixed some bugs when a vocabulary has no one term.
 - #792870 Suggestion by creando sensaciones: Now a branch can be opened without select their term by clicking in their marker.
 - Fixed #792870 bug report by creando sensaciones: When you save a term, vocabulary lost their tree select setting.
+
 
 Taxonomy Tree Select 6.x-1.0-alpha1
 ----------------------
