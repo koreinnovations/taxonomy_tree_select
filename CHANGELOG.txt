@@ -3,6 +3,7 @@
 Taxonomy Tree Select 6.x-1.0-dev
 ----------------------
 - Fixed #908910 bug report by jessehs: JS/CSS files not loading after a validation error.
+- Fixed #866036 bug report by José San Martin: Support for Mac's Command Key.
 
 
 Taxonomy Tree Select 6.x-1.0-alpha2
