@@ -1,29 +1,29 @@
 /* $Id$ */
 
-div.taxonomy-tree ul.menu {
+div.item-list ul.taxonomy-tree {
   margin: 0;
 }
-div.taxonomy-tree ul.menu li {
+div.item-list ul.taxonomy-tree li {
   margin: 2px 0;
   padding-bottom: 0;
   padding-right: 0;
   padding-top: 0;
 }
-div.taxonomy-tree ul.menu li.expansable {
+div.item-list ul.taxonomy-tree li.expansable {
   cursor: pointer;
 }
-div.taxonomy-tree ul.menu li.expansable ul {
+div.item-list ul.taxonomy-tree li.expansable ul {
   cursor: default;
 }
-div.taxonomy-tree ul.menu label {
+div.item-list ul.taxonomy-tree label {
   cursor: pointer;
-  font-weight: normal;
+  display: block;
   padding: 0 5px;
 }
-div.taxonomy-tree ul.menu label:hover {
+div.item-list ul.taxonomy-tree label:hover {
   background-color: #EEE;
 }
-div.taxonomy-tree ul.menu label.active {
+div.item-list ul.taxonomy-tree label.active {
   background-color: #222;
   color: #fff;
   font-weight: bold;
