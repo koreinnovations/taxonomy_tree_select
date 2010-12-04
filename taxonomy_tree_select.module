@@ -3,6 +3,17 @@
 
 
 /**
+ * Implementation of hook_theme().
+ */
+function taxonomy_tree_select_theme($existing, $type, $theme, $path) {
+  return array(
+    'taxonomy_tree_select_list' => array(
+      'arguments' => array('element' => NULL),
+    )
+  );
+}
+
+/**
  * Implementation of hook_form_alter().
  */
 function taxonomy_tree_select_form_taxonomy_form_vocabulary_alter(&$form, &$form_state) {
@@ -49,35 +60,28 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
 
   // Work on node form...
   if ($form['#id'] == 'node-form' && $form['taxonomy']) {
+
+    // Walk on all taxonomy fields
+
     foreach ($form['taxonomy'] as $key => $vocabulary) {
       $tree_select = variable_get('vocabulary_' . $key . '_tree_select', 0);
+
+      // Check if is an tree select vocabulary
       if (is_array($vocabulary) && $tree_select) {
-        $safe_terms = _taxonomy_tree_select_taxonomy_format_tree(taxonomy_get_tree($key), 0);
 
-        // Prepare one vocabulary to be passed to javascript
-        $treeded_vocabularies[$key] = array(
-          'id' => $key,
-          'terms' => $safe_terms,
-          'multiple' => $vocabulary['#multiple']
-        );
-
-        // Add an custom class based on theme in use
-        $treeded_vocabularies[$key]['classes'][] = 'taxonomy-tree-' . $theme;
+        // Replace select with radios or checkboxes
+        $form['taxonomy'][$key] = _taxonomy_tree_select_individualize_selectbox($form['taxonomy'][$key]);
+        $form['taxonomy'][$key]['#theme'] = 'taxonomy_tree_select_list';
       }
     }
-
-    // If is there some vocabulary to be added into javascript setting
-    if (count($treeded_vocabularies)) {
-
-      // Store the array in a way that can be acessed by #after_build function
-      $form['taxonomy_tree_select']['treeded_vocabularies'] = array(
-        '#type' => 'value',
-        '#value' => $treeded_vocabularies
-      );
-
-      $form['#after_build'][] = '_taxonomy_tree_select_add_external_files';
-    }
   }
+}
+
+/**
+ * @TODO Render terms in nested lists.
+ */
+function theme_taxonomy_tree_select_list($element) {
+  return drupal_render($element);
 }
 
 /**
@@ -98,36 +102,54 @@ function _taxonomy_tree_select_add_external_files($form, $form_state) {
 }
 
 /**
- * Put terms in a nested array.
- *
- * @param $terms
- *   A string containing an email address.
- *
- * @return
- *   Array with the terms and each of it's children
+ * Convert an select box element to a series of radio/checkboxes elements.
  */
-function _taxonomy_tree_select_taxonomy_format_tree($terms = array(), $parent = 0, $tree_temp = array()) {
-  foreach ($terms as $term) {
-    if ($term->parents[0] == $parent) {
-      // Since this array will be send to javascript,
-      // is good that it contains less data as possible
-      // (nothing more than tid, name and subterms)
-      $safe_terms[$term->tid] = array(
-        'tid' => $term->tid,
-        'name' => $term->name
-      );
+function _taxonomy_tree_select_individualize_selectbox($element) {
+  if ($element['#type'] == 'select') {
+    if ($element['#multiple']) {
+      $element['#type'] = 'checkboxes';
     }
     else {
-      $tree_temp[$term->parents[0]][$term->tid] = $term;
-    }
-  }
+      $element['#type'] = 'radios';
 
-  if (is_array($safe_terms)) {
-    foreach ($safe_terms as &$term) {
-      if (isset($tree_temp[$term['tid']])) {
-        $term['terms'] = _taxonomy_tree_select_taxonomy_format_tree($tree_temp[$term['tid']], $term['tid'], $tree_temp);
+      // Altough #default_value can always be an array even with non-multiple
+      // select fields, it needs to be an string with radios fields
+      if ($element['#default_value']) {
+        $element['#default_value'] = array_shift($element['#default_value']);
+      }
+      else {
+        $element['#default_value'] = '';
       }
     }
   }
-  return $safe_terms;
+
+  foreach ($element['#options'] as $key => &$option) {
+
+    // Rewrite the options to be used with checkboxes/radios fapi types
+    if (is_object($option)) {
+      if (is_array($option->option)) {
+        list($tid) = array_keys($option->option);
+        $term_name  = $option->option[$tid];
+      }
+      $options[$tid] = $term_name;
+    }
+
+    // "None" option from non required vocabularies
+    elseif (!$element['#multiple'] && !$key) {
+      $options[0] = $option;
+    }
+
+    // Remove default options
+    unset($element['#options'][$key]);
+  }
+
+  $element['#options'] = $options;
+
+  // Remove select-only attributes
+  unset(
+    $element['#multiple'],
+    $element['#size']
+  );
+
+  return $element;
 }
