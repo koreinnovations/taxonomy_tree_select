@@ -70,6 +70,8 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
 
         // Replace select with radios or checkboxes
         $form['taxonomy'][$key] = _taxonomy_tree_select_individualize_selectbox($form['taxonomy'][$key]);
+
+        // Apply theme to render field into nested lists
         $form['taxonomy'][$key]['#theme'] = 'taxonomy_tree_select_nested_lists';
 
         // Add external files
@@ -117,20 +119,23 @@ function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $par
         'data' => drupal_render($element[$term->tid])
       );
     }
-     else {
-       $tree_temp[$term->parents[0]][$term->tid] = $term;
-     }
-   }
+    else {
+      $tree_temp[$term->parents[0]][$term->tid] = $term;
+    }
+  }
 
-   if (is_array($terms)) {
-     foreach ($terms as $tid => &$term) {
-       if (isset($tree_temp[$tid])) {
-         $term['children'] = theme_taxonomy_tree_select_nested_lists($element, $tree_temp[$tid], $tid, $tree_temp);
+  if (is_array($terms)) {
+    foreach ($terms as $tid => &$term) {
+      if (isset($tree_temp[$tid])) {
+        $term['children'] = theme_taxonomy_tree_select_nested_lists($element, $tree_temp[$tid], $tid, $tree_temp);
 
-         $term['class'] = 'expansable expanded';
-       }
-     }
-   }
+        $term['class'] = 'expansable expanded';
+      }
+      else {
+        $term['class'] = 'leaf';
+      }
+    }
+  }
 
   if ($parent) {
     return $terms;
