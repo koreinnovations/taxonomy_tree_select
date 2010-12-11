@@ -1,7 +1,8 @@
 // $Id$
 
-Taxonomy Tree Select 6.x-1.0-dev
+Taxonomy Tree Select 6.x-1.0-alpha3
 ----------------------
+- #809952 Request by fschaap: Now an list of checkboxes/radios is generated via PHP instead the old JavaScript way.
 - Fixed #908910 bug report by jessehs: JS/CSS files not loading after a validation error.
 - Fixed #866036 bug report by José San Martin: Support for Mac's Command Key.
 
