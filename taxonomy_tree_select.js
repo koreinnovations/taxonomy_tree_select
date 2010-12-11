@@ -16,10 +16,10 @@ Drupal.behaviors.taxonomyTreeSelect = function(context) {
             $item = $target.is('li') ? $target : $target.parents('li:eq(0)'),
             $input = $item.find('input:eq(0)');
 
-        if ($item.length) {
+        if ($item.length && $item.is('.expansable')) {
           $item.trigger('toggle');
-          $inputs.trigger('sync');
         }
+        $inputs.trigger('sync');
       });
 
     $inputs
