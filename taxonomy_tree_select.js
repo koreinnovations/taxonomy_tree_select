@@ -1,147 +1,83 @@
 // $Id$
 
-Drupal.taxonomyTreeSelect = Drupal.taxonomyTreeSelect ? Drupal.taxonomyTreeSelect : {};
-
 Drupal.behaviors.taxonomyTreeSelect = function(context) {
-  if (vocabularies = Drupal.settings.taxonomyTreeSelect && Drupal.settings.taxonomyTreeSelect) {
-    var $form = $("#node-form", context),
-    $wrapper;
+  var $form = $("#node-form", context),
+      $taxonomyTrees = $form.find('ul.taxonomy-tree');
 
-    if (vocabularies && $form.length) {
-      $.each(vocabularies, function(i) {
-        var vocabulary = vocabularies[i];
+  $taxonomyTrees.each(function() {
+    var $taxonomyTree = $(this),
+        $inputs = $taxonomyTree.find('input'),
+        $expansables = $taxonomyTree.find("li.expansable");
 
-        if (!vocabulary.terms) {
-          return;
+    $taxonomyTree
+      // Attach the click event on the list to make use of event delegation
+      .bind('click', function(event) {
+        var $target = $(event.target).not('label'), // Ignoring label because it trigger a click to their 'input'
+            $item = $target.is('li') ? $target : $target.parents('li:eq(0)'),
+            $input = $item.find('input:eq(0)');
+
+        if ($item.length) {
+          $item.trigger('toggle');
+          $inputs.trigger('sync');
         }
-        
-        var $wrapper = $("#edit-taxonomy-" + vocabulary.id + "-wrapper");
-        var $select = $("#edit-taxonomy-" + vocabulary.id);
-
-        var listId = "taxonomy-" + vocabulary.id + "-tree";
-        var list = Drupal.taxonomyTreeSelect.BuildList(vocabulary.terms);
-        var classes = vocabulary.classes ? vocabulary.classes : [];
-        classes.push("taxonomy-tree");
-        
-        list = "<div id='" + listId + "' class='" + classes.join(" ") + "'>" + list + "</div>";
-
-        $select.hide();
-        $wrapper.append(list);
-        var $list = $("#" + listId);
-        var $items = $list.find("label");
-        var $expansables = $list.find("li.expansable");
-
-        $list
-          .bind("click", function(e) {
-            var $target = $(e.target);
-            var multiple = (e.ctrlKey || e.metaKey) && vocabulary.multiple;
-
-            if ($target.is("li")) {
-              var target = "li";
-              var $item = $target;
-            }
-            else if ($target.is("label")) {
-              var target = "label";
-              var $item = $target.parent("li");
-            }
-
-            switch (target) {
-              case "label":
-                var labelFor = $target.attr("for");
-
-                if (!multiple) {
-                  $list.find(".active").removeClass("active");
-                  $select.find("option[selected]").removeAttr("selected");
-                }
-
-                if (multiple && $target.is(".active")) {
-                  $target.removeClass("active");
-                  $select.find("option[value='" + labelFor + "']").removeAttr("selected");
-                }
-                else {
-                  $target.addClass("active");
-                  $select.find("option[value='" + labelFor + "']").attr("selected", "selected");
-                }
-              case "li":
-                var $child = $item.children("ul");
-
-                if ($child.length && $child.is(":visible") && !multiple) {
-                  $item.trigger("collapse");
-                }
-                else if ($child.length && !$child.is(":visible")) {
-                  $item.trigger("expand");
-                }
-            }
-          });
-
-        $items
-          .bind("sync", function(e) {
-            var $label = $(this);
-            if (!$label.is("label")) {
-              return;
-            }
-            var labelFor = $label.attr("for");
-            var state = $select.find("option[value='" + labelFor + "']").attr("selected");
-
-            if (state) {
-              $label.addClass("active");
-            }
-            else {
-              $label.removeClass("active");
-            }
-          });
-
-        $expansables
-          .bind("init", function(e) {
-            var $item = $(this);
-            if ($item.find(".active").length) {
-              $item.trigger("expand");
-            }
-          })
-          .bind("collapse", function() {
-            var $item = $(this);
-            var $child = $item.children("ul");
-            $child.slideUp("fast");
-            $item
-              .removeClass("expanded")
-              .addClass("collapsed");
-          })
-          .bind("expand", function() {
-            var $item = $(this);
-            var $child = $item.children("ul");
-            $child.slideDown("fast");
-            $item
-              .removeClass("collapsed")
-              .addClass("expanded");
-          })
-          .children("ul").hide();
-
-        $items.trigger("sync");
-        $expansables.trigger("init");
       });
-    }
-  }
-};
 
-Drupal.taxonomyTreeSelect.BuildList = function(terms) {
-  var list = "<ul class='menu'>";
-    $.each(terms, function(i, term) {
-      var classes = [];
-      if (term.terms) {
-        classes.push("collapsed");
-        classes.push("expansable");
-      }
-      else {
-        classes.push("leaf");
-      }
-      list += "<li id='taxonomy-tree-tid-" + term.tid + "' class='" + classes.join(" ") + "'>";
-      list += "<label for='" + term.tid + "' id='edit-taxonomy-tree-tid-" + term.tid + "-link'>" + term.name + "</label>";
-      if (term.terms) {
-        list += Drupal.taxonomyTreeSelect.BuildList(term.terms);
-      }
-      list += "</li>";
-    });
-  list += "</ul>";
+    $inputs
+      // Syncronize checked/unchecked status of the fields with active/inactive classes
+      .bind('sync', function() {
+        var $input = $(this),
+            $item = $input.parent('label').parent('div.form-item');
 
-  return list;
+        if ($item.length) {
+          if ($input.is(':checked')) {
+            $item.addClass("active");
+          }
+          else {
+            $item.removeClass("active");
+          }
+        }
+      })
+      // Run sync event when the page loads
+      .trigger("sync");
+
+    $expansables
+      // Make sure all lists that have active children starts expanded
+      .bind('init', function(e) {
+        var $item = $(this);
+        if ($item.find('.active').length) {
+          $item.trigger('expand');
+        }
+      })
+      // Collapse list
+      .bind('collapse', function() {
+        var $item = $(this),
+            $child = $item.children('div.item-list').children('ul');
+        $child.slideUp('fast');
+        $item
+          .removeClass('expanded')
+          .addClass('collapsed');
+      })
+      // Expand list
+      .bind('expand', function() {
+        var $item = $(this),
+            $child = $item.children('div.item-list').children('ul');
+        $child.slideDown('fast');
+        $item
+          .removeClass('collapsed')
+          .addClass('expanded');
+      })
+      // Expand or collapse
+      .bind('toggle', function() {
+        var $item = $(this),
+            $child = $item.children('div.item-list').children('ul');
+        if ($child.is(':visible')) {
+          $item.trigger('collapse');
+        }
+        else {
+          $item.trigger('expand');
+        }
+      })
+      // Run init event when the page loads
+      .trigger('init');
+  });
 };
