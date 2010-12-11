@@ -100,9 +100,10 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
  */
 function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $parent = 0, $tree_temp = array()) {
   global $theme;
+  
+  $vid = $element['#parents'][1];
 
   if (!$tree) {
-    $vid = $element['#parents'][1];
     $tree = taxonomy_get_tree($vid);
   }
   $list = array();
@@ -110,7 +111,7 @@ function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $par
   foreach ($tree as $term) {
     if ($term->parents[0] == $parent) {
 
-      // @TODO: Make some way to translate the term name
+      // @TODO: Make some way to translate the term name / integration with Internationalization UI module
       $element[$term->tid]['#title'] = $term->name;
 
       $terms[$term->tid] = array(
@@ -141,6 +142,14 @@ function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $par
   else {
     $tree_classes[] = 'taxonomy-tree';
     $tree_classes[] = sprintf('taxonomy-tree-theme-%s', $theme);
+
+    // There's no user interface for this option, you can by enable it by
+    // manually add an variable vocabulary_%vid_tree_select_show_input
+    // with the value 0.
+    if (!variable_get('vocabulary_' . $vid . '_tree_select_show_input', 1)) {
+      $tree_classes[] = 'taxonomy-tree-hidden-input';
+    }
+
     return theme('item_list', $terms, NULL, 'ul', array('class' => implode(' ', $tree_classes)));
   }
 }

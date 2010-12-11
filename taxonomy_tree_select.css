@@ -36,6 +36,9 @@ div.item-list ul.taxonomy-tree div.active label {
   color: #fff;
   font-weight: bold;
 }
+div.item-list ul.taxonomy-tree-hidden-input input {
+  display: none;
+}
 
 /**
  * Colors for Garland theme
