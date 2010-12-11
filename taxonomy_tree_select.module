@@ -56,8 +56,6 @@ function taxonomy_tree_select_taxonomy($op, $type, $form_values) {
  * Implementation of hook_form_alter().
  */
 function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
-  global $theme;
-
   // Work on node form...
   if ($form['#id'] == 'node-form' && $form['taxonomy']) {
 
@@ -75,9 +73,7 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
         $form['taxonomy'][$key]['#theme'] = 'taxonomy_tree_select_nested_lists';
 
         // Add external files
-        drupal_add_css(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.css');
-        // @TODO: Rework on js to match the new server-side generated lists
-        // drupal_add_js(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.js');
+        $form['#after_build'][] = '_taxonomy_tree_select_add_external_files';
       }
     }
   }
@@ -103,6 +99,8 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
  *   Rendered item list with the terms of the element
  */
 function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $parent = 0, $tree_temp = array()) {
+  global $theme;
+
   if (!$tree) {
     $vid = $element['#parents'][1];
     $tree = taxonomy_get_tree($vid);
@@ -141,7 +139,9 @@ function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $par
     return $terms;
   }
   else {
-    return theme('item_list', $terms, NULL, 'ul', array('class' => 'taxonomy-tree'));
+    $tree_classes[] = 'taxonomy-tree';
+    $tree_classes[] = sprintf('taxonomy-tree-theme-%s', $theme);
+    return theme('item_list', $terms, NULL, 'ul', array('class' => implode(' ', $tree_classes)));
   }
 }
 
@@ -202,4 +202,17 @@ function _taxonomy_tree_select_individualize_selectbox($element) {
   );
 
   return $element;
+}
+
+/**
+ * Add external files.
+ *
+ * This is done in a after build function to make sure this files will be
+ * loaded even when the hook_form_alter doesn't run (i.e. in a form error).
+ */
+function _taxonomy_tree_select_add_external_files($form, $form_state) {
+  drupal_add_css(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.css');
+  drupal_add_js(drupal_get_path('module', 'taxonomy_tree_select') . '/taxonomy_tree_select.js');
+
+  return $form;
 }
