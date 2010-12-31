@@ -1,5 +1,10 @@
 // $Id$
 
+Taxonomy Tree Select 6.x-1.0-dev
+----------------------
+- Fixed #1002290 bug report by danillonunes: Missing "None" option from non-required vocabularies.
+
+
 Taxonomy Tree Select 6.x-1.0-alpha3
 ----------------------
 - #809952 Request by fschaap: Now an list of checkboxes/radios is generated via PHP instead the old JavaScript way.
