@@ -100,13 +100,14 @@ function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
  */
 function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $parent = 0, $tree_temp = array()) {
   global $theme;
-  
+
   $vid = $element['#parents'][1];
 
+  // When this function is called first time (not by herself), there's not $tree.
   if (!$tree) {
     $tree = taxonomy_get_tree($vid);
   }
-  $list = array();
+  $list = $terms = array();
 
   foreach ($tree as $term) {
     if ($term->parents[0] == $parent) {
@@ -140,6 +141,11 @@ function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $par
     return $terms;
   }
   else {
+    // Option zero is the "none" option for radios boxes.
+    if ($element[0]) {
+      $list[0] = drupal_render($element[0]);
+    }
+
     $tree_classes[] = 'taxonomy-tree';
     $tree_classes[] = sprintf('taxonomy-tree-theme-%s', $theme);
 
@@ -150,7 +156,10 @@ function theme_taxonomy_tree_select_nested_lists($element, $tree = array(), $par
       $tree_classes[] = 'taxonomy-tree-hidden-input';
     }
 
-    return theme('item_list', $terms, NULL, 'ul', array('class' => implode(' ', $tree_classes)));
+    // Add terms to list to be printed
+    $list = array_merge($list, $terms);
+
+    return theme('item_list', $list, NULL, 'ul', array('class' => implode(' ', $tree_classes)));
   }
 }
 
