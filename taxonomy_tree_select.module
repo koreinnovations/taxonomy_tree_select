@@ -18,7 +18,9 @@ function taxonomy_tree_select_theme($existing, $type, $theme, $path) {
  */
 function taxonomy_tree_select_form_taxonomy_form_vocabulary_alter(&$form, &$form_state) {
   // Work on vocabulary settings form
-  $form['settings']['tags']['#weight'] = $form['settings']['tags']['#weight'] ? $form['settings']['tags']['#weight'] : -2;
+  if (!array_key_exists('#weight', $form['settings']['tags'])) {
+    $form['settings']['tags']['#weight'] = -2;
+  }
   $form['settings']['taxonomy_tree_select'] = array(
     '#type' => 'checkbox',
     '#title' => t('Tree select'),
