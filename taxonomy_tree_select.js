@@ -1,4 +1,3 @@
-// $Id$
 
 Drupal.behaviors.taxonomyTreeSelect = function(context) {
   var $form = $("#node-form", context),
