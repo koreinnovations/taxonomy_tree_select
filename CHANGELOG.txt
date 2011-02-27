@@ -1,5 +1,5 @@
 
-Taxonomy Tree Select 6.x-1.0-dev
+Taxonomy Tree Select 6.x-1.0
 ----------------------
 - Fixed #1002290 bug report by danillonunes: Missing "None" option from non-required vocabularies.
 
