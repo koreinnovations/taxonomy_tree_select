@@ -59,6 +59,7 @@ function taxonomy_tree_select_taxonomy($op, $type, $form_values) {
 function taxonomy_tree_select_form_alter(&$form, &$form_state, $form_id) {
   // Work on node form...
   if ($form['#id'] == 'node-form' && $form['taxonomy']) {
+    $form['#attributes']['class'] = 'has-tree-select';
 
     // Walk on all taxonomy fields
     foreach ($form['taxonomy'] as $key => $vocabulary) {

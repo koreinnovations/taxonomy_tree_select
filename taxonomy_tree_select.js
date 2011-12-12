@@ -1,6 +1,6 @@
 
 Drupal.behaviors.taxonomyTreeSelect = function(context) {
-  var $form = $("#node-form", context),
+  var $form = $(".has-tree-select", context),
       $taxonomyTrees = $form.find('ul.taxonomy-tree');
 
   $taxonomyTrees.each(function() {
